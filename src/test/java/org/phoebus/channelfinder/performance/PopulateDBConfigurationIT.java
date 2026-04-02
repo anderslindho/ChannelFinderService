@@ -1,6 +1,7 @@
 package org.phoebus.channelfinder.performance;
 
 import java.net.URL;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.phoebus.channelfinder.configuration.PopulateDBConfiguration;
 import org.phoebus.channelfinder.service.AuthorizationService;
@@ -27,7 +28,7 @@ class PopulateDBConfigurationIT {
 
   @Test
   void testCreateDB() {
-    populateDBConfiguration.createDB();
+    Assertions.assertDoesNotThrow(() -> populateDBConfiguration.createDB());
   }
 
   @Test

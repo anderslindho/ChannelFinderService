@@ -1,6 +1,7 @@
 package org.phoebus.channelfinder.performance;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.phoebus.channelfinder.configuration.PopulateDBConfiguration;
@@ -21,7 +22,7 @@ class ExistsPerformanceIT {
   @Autowired ChannelRepository channelRepository;
 
   @Test
-  void channelExists() {
+  void channelExists() throws IOException {
     service.createDB(1);
     Assertions.assertTrue(
         channelRepository.existsByIds(Lists.newArrayList(service.getChannelList())));
