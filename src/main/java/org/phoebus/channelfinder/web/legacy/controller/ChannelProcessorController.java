@@ -1,10 +1,10 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web.legacy.controller;
 
 import java.util.List;
 import org.phoebus.channelfinder.entity.Channel;
-import org.phoebus.channelfinder.rest.api.IChannelProcessor;
 import org.phoebus.channelfinder.service.ChannelProcessorService;
 import org.phoebus.channelfinder.service.model.archiver.ChannelProcessorInfo;
+import org.phoebus.channelfinder.web.legacy.api.IChannelProcessor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;

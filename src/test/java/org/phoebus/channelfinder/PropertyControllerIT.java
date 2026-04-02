@@ -19,10 +19,11 @@ import org.phoebus.channelfinder.configuration.ElasticConfig;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.Property;
 import org.phoebus.channelfinder.entity.Tag;
+import org.phoebus.channelfinder.exceptions.PropertyNotFoundException;
 import org.phoebus.channelfinder.repository.ChannelRepository;
 import org.phoebus.channelfinder.repository.PropertyRepository;
-import org.phoebus.channelfinder.rest.api.IProperty;
-import org.phoebus.channelfinder.rest.controller.PropertyController;
+import org.phoebus.channelfinder.web.legacy.api.IProperty;
+import org.phoebus.channelfinder.web.legacy.controller.PropertyController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,7 +31,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.server.ResponseStatusException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest(PropertyController.class) // TODO Somehow creating one
@@ -150,7 +150,7 @@ class PropertyControllerIT {
   void readNonExistingXmlProperty() {
     // verify the property failed to be read, as expected
     Assertions.assertThrows(
-        ResponseStatusException.class, () -> propertyManager.read("fakeProperty", false));
+        PropertyNotFoundException.class, () -> propertyManager.read("fakeProperty", false));
   }
 
   /** attempt to read a single non existent property with channels */
@@ -158,7 +158,7 @@ class PropertyControllerIT {
   void readNonExistingXmlProperty2() {
     // verify the property failed to be read, as expected
     Assertions.assertThrows(
-        ResponseStatusException.class, () -> propertyManager.read("fakeProperty", true));
+        PropertyNotFoundException.class, () -> propertyManager.read("fakeProperty", true));
   }
 
   /** create a simple property */

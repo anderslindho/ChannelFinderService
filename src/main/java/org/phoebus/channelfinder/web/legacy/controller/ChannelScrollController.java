@@ -1,15 +1,13 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web.legacy.controller;
 
 import org.phoebus.channelfinder.entity.Scroll;
-import org.phoebus.channelfinder.rest.api.IChannelScroll;
 import org.phoebus.channelfinder.service.ChannelScrollService;
+import org.phoebus.channelfinder.web.legacy.api.IChannelScroll;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 @EnableAutoConfiguration
 @RequestMapping("${channelfinder.legacy.service-root:ChannelFinder}/resources/scroll")

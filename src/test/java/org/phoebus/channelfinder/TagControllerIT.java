@@ -19,10 +19,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.phoebus.channelfinder.configuration.ElasticConfig;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.Tag;
+import org.phoebus.channelfinder.exceptions.TagNotFoundException;
 import org.phoebus.channelfinder.repository.ChannelRepository;
 import org.phoebus.channelfinder.repository.TagRepository;
-import org.phoebus.channelfinder.rest.api.ITag;
-import org.phoebus.channelfinder.rest.controller.TagController;
+import org.phoebus.channelfinder.web.legacy.api.ITag;
+import org.phoebus.channelfinder.web.legacy.controller.TagController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,7 +31,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.server.ResponseStatusException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest(TagController.class)
@@ -102,14 +102,14 @@ class TagControllerIT {
   @Test
   void readNonExistingXmlTag() {
     // verify the tag failed to be read, as expected
-    Assertions.assertThrows(ResponseStatusException.class, () -> tagManager.read("fakeTag", false));
+    Assertions.assertThrows(TagNotFoundException.class, () -> tagManager.read("fakeTag", false));
   }
 
   /** attempt to read a single non existent tag with channels */
   @Test
   void readNonExistingXmlTag2() {
     // verify the tag failed to be read, as expected
-    Assertions.assertThrows(ResponseStatusException.class, () -> tagManager.read("fakeTag", true));
+    Assertions.assertThrows(TagNotFoundException.class, () -> tagManager.read("fakeTag", true));
   }
 
   /** create a simple tag */
