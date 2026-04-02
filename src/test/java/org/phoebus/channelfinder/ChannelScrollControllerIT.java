@@ -78,10 +78,10 @@ class ChannelScrollControllerIT {
     MultiValueMap<String, String> searchParameters = new LinkedMultiValueMap<String, String>();
     // Search for a single unique channel
     searchParameters.add("~name", channelNames.get(0));
-    Scroll scrollResult = channelScroll.search(null, searchParameters);
+    Scroll scrollResult = channelScroll.query(searchParameters);
     List<Channel> result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertTrue(
@@ -90,20 +90,20 @@ class ChannelScrollControllerIT {
     // Search for all channels via wildcards
     searchParameters.clear();
     searchParameters.add("~name", "BR:C001-BI:2{BLA}Pos:?-RB");
-    scrollResult = channelScroll.search(null, searchParameters);
+    scrollResult = channelScroll.query(searchParameters);
     result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertSame(2, result.size(), "Expected 2 but got " + result.size());
 
     searchParameters.clear();
     searchParameters.add("~name", "BR:C001-BI:?{BLA}Pos:*");
-    scrollResult = channelScroll.search(null, searchParameters);
+    scrollResult = channelScroll.query(searchParameters);
     result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertSame(4, result.size(), "Expected 4 but got " + result.size());
@@ -111,10 +111,10 @@ class ChannelScrollControllerIT {
     // Search for all 1000 channels
     searchParameters.clear();
     searchParameters.add("~name", "SR*");
-    scrollResult = channelScroll.search(null, searchParameters);
+    scrollResult = channelScroll.query(searchParameters);
     result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertEquals(1000, result.size(), "Expected 1000 but got " + result.size());
@@ -122,20 +122,20 @@ class ChannelScrollControllerIT {
     // Search for all 1000 SR channels and all 500 booster channels
     searchParameters.clear();
     searchParameters.add("~name", "SR*|BR*");
-    scrollResult = channelScroll.search(null, searchParameters);
+    scrollResult = channelScroll.query(searchParameters);
     result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertEquals(1500, result.size(), "Expected 1500 but got " + result.size());
 
     searchParameters.clear();
     searchParameters.add("~name", "SR*,BR*");
-    scrollResult = channelScroll.search(null, searchParameters);
+    scrollResult = channelScroll.query(searchParameters);
     result = scrollResult.getChannels();
     while (scrollResult.getChannels().size() == 100) {
-      scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+      scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
     }
     Assertions.assertEquals(1500, result.size(), "Expected 1500 but got " + result.size());
@@ -149,10 +149,10 @@ class ChannelScrollControllerIT {
       searchParameters.add("~name", "SR*");
       searchParameters.add("~tag", "group" + id + "_" + val_bucket.get(index));
 
-      scrollResult = channelScroll.search(null, searchParameters);
+      scrollResult = channelScroll.query(searchParameters);
       result = scrollResult.getChannels();
       while (scrollResult.getChannels().size() == 100) {
-        scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+        scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
         result.addAll(scrollResult.getChannels());
       }
       Assertions.assertEquals(
@@ -175,10 +175,10 @@ class ChannelScrollControllerIT {
       searchParameters.add("~name", "SR*");
       searchParameters.add("group" + id, String.valueOf(val_bucket.get(index)));
 
-      scrollResult = channelScroll.search(null, searchParameters);
+      scrollResult = channelScroll.query(searchParameters);
       result = scrollResult.getChannels();
       while (scrollResult.getChannels().size() == 100) {
-        scrollResult = channelScroll.search(scrollResult.getId(), searchParameters);
+        scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
         result.addAll(scrollResult.getChannels());
       }
       Assertions.assertEquals(
