@@ -1,39 +1,25 @@
 package org.phoebus.channelfinder.rest.controller;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.phoebus.channelfinder.entity.Channel;
-import org.phoebus.channelfinder.entity.Scroll;
 import org.phoebus.channelfinder.rest.api.IChannelProcessor;
-import org.phoebus.channelfinder.rest.api.IChannelScroll;
-import org.phoebus.channelfinder.service.AuthorizationService;
 import org.phoebus.channelfinder.service.ChannelProcessorService;
 import org.phoebus.channelfinder.service.model.archiver.ChannelProcessorInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @EnableAutoConfiguration
+@RequestMapping("${channelfinder.legacy.service-root:ChannelFinder}/resources/processors")
 public class ChannelProcessorController implements IChannelProcessor {
 
-  private static final Logger logger = Logger.getLogger(ChannelProcessorController.class.getName());
+  private final ChannelProcessorService channelProcessorService;
 
-  @Autowired ChannelProcessorService channelProcessorService;
-  @Autowired AuthorizationService authorizationService;
-
-  // TODO replace with PIT and search_after
-  @Autowired IChannelScroll channelScroll;
-
-  @Value("${elasticsearch.query.size:10000}")
-  private int defaultMaxSize;
+  public ChannelProcessorController(ChannelProcessorService channelProcessorService) {
+    this.channelProcessorService = channelProcessorService;
+  }
 
   @Override
   public long processorCount() {
@@ -47,37 +33,12 @@ public class ChannelProcessorController implements IChannelProcessor {
 
   @Override
   public long processAllChannels() {
-    logger.log(Level.INFO, "Calling processor on ALL channels in ChannelFinder");
-    // Only allow authorized users to trigger this operation
-    if (authorizationService.isAuthorizedRole(
-        SecurityContextHolder.getContext().getAuthentication(),
-        AuthorizationService.ROLES.CF_ADMIN)) {
-      MultiValueMap<String, String> searchParameters = new LinkedMultiValueMap<String, String>();
-      searchParameters.add("~name", "*");
-      return processChannels(searchParameters);
-    } else {
-      logger.log(
-          Level.SEVERE,
-          "User does not have the proper authorization to perform this operation: /process/all",
-          new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED,
-          "User does not have the proper authorization to perform this operation: /process/all");
-    }
+    return channelProcessorService.processAllChannels();
   }
 
   @Override
   public long processChannels(MultiValueMap<String, String> allRequestParams) {
-    long channelCount = 0;
-    Scroll scrollResult = channelScroll.query(allRequestParams);
-    channelCount += scrollResult.getChannels().size();
-    processChannels(scrollResult.getChannels());
-    while (scrollResult.getChannels().size() == defaultMaxSize) {
-      scrollResult = channelScroll.search(scrollResult.getId(), allRequestParams);
-      channelCount += scrollResult.getChannels().size();
-      processChannels(scrollResult.getChannels());
-    }
-    return channelCount;
+    return channelProcessorService.processChannelsByQuery(allRequestParams);
   }
 
   @Override

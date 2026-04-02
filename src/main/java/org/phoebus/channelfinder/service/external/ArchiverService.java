@@ -62,7 +62,7 @@ public class ArchiverService {
 
   @Autowired
   public ArchiverService(
-      RestClient.Builder builder, @Value("${aa.timeout_seconds:15}") int timeoutSeconds) {
+      @Value("${aa.timeout_seconds:15}") int timeoutSeconds, RestClient.Builder builder) {
     SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
     factory.setReadTimeout(timeoutSeconds * 1000);
     this.client = builder.requestFactory(factory).build();
