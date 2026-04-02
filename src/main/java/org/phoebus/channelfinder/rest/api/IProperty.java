@@ -1,7 +1,5 @@
 package org.phoebus.channelfinder.rest.api;
 
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.PROPERTY_RESOURCE_URI;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,11 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping(PROPERTY_RESOURCE_URI)
 public interface IProperty {
 
   @Operation(
@@ -272,21 +268,4 @@ public interface IProperty {
    *
    * @param property validate property
    */
-  void validatePropertyRequest(Property property);
-
-  /**
-   * Checks if 1. the property name is not null and matches the name in the body 2. the property
-   * owner is not null or empty 3. the property value is not null or empty 4. all the listed
-   * channels exist
-   *
-   * @param properties properties to be validated
-   */
-  void validatePropertyRequest(Iterable<Property> properties);
-
-  /**
-   * Checks if the channel exists
-   *
-   * @param channelName check channel exists
-   */
-  void validatePropertyRequest(String channelName);
 }

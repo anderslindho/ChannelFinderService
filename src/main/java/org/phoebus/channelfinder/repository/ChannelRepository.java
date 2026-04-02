@@ -49,14 +49,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.phoebus.channelfinder.common.CFResourceDescriptors;
 import org.phoebus.channelfinder.common.TextUtil;
 import org.phoebus.channelfinder.configuration.ElasticConfig;
+import org.phoebus.channelfinder.configuration.LegacyApiProperties;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.Property;
+import org.phoebus.channelfinder.entity.Scroll;
 import org.phoebus.channelfinder.entity.SearchResult;
 import org.phoebus.channelfinder.entity.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -73,14 +73,21 @@ public class ChannelRepository implements CrudRepository<Channel, String> {
 
   private static final Logger logger = Logger.getLogger(ChannelRepository.class.getName());
 
-  @Autowired ElasticConfig esService;
-
-  @Autowired
-  @Qualifier("indexClient")
-  ElasticsearchClient client;
+  private final ElasticConfig esService;
+  private final ElasticsearchClient client;
+  private final String scrollResourceUri;
 
   @Value("${repository.chunk.size:10000}")
   private int chunkSize;
+
+  public ChannelRepository(
+      ElasticConfig esService,
+      @Qualifier("indexClient") ElasticsearchClient client,
+      LegacyApiProperties legacyApiProperties) {
+    this.esService = esService;
+    this.client = client;
+    this.scrollResourceUri = legacyApiProperties.getServiceRoot() + "/resources/scroll";
+  }
 
   // Object mapper to ignore properties we don't want to index
   final ObjectMapper objectMapper =
@@ -517,9 +524,7 @@ public class ChannelRepository implements CrudRepository<Channel, String> {
           MessageFormat.format(
               TextUtil.SEARCH_FAILED_CAUSE,
               searchParameters,
-              "Max search window exceeded, use the "
-                  + CFResourceDescriptors.SCROLL_RESOURCE_URI
-                  + " api.");
+              "Max search window exceeded, use the " + scrollResourceUri + " api.");
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -762,6 +767,39 @@ public class ChannelRepository implements CrudRepository<Channel, String> {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("~tag", tagName);
     return this.count(params);
+  }
+
+  /**
+   * Scroll-paginated search. Returns a page of channels and the ID to pass as scrollId on the next
+   * call to advance the cursor. Accepts the same query parameters as {@link #search}.
+   *
+   * @param scrollId opaque cursor from a previous call, or {@code null} for the first page
+   * @param searchParameters channel search parameters
+   * @return next page with its cursor
+   */
+  public Scroll scroll(String scrollId, MultiValueMap<String, String> searchParameters) {
+    BuiltQuery builtQuery = getBuiltQuery(searchParameters);
+    try {
+      SearchRequest.Builder builder =
+          new SearchRequest.Builder()
+              .index(esService.getES_CHANNEL_INDEX())
+              .query(builtQuery.boolQuery.build()._toQuery())
+              .from(builtQuery.from)
+              .size(builtQuery.size)
+              .sort(SortOptions.of(o -> o.field(FieldSort.of(f -> f.field("name")))));
+      if (scrollId != null && !scrollId.isEmpty()) {
+        builder.searchAfter(FieldValue.of(scrollId));
+      }
+      SearchResponse<Channel> response = client.search(builder.build(), Channel.class);
+      List<Hit<Channel>> hits = response.hits().hits();
+      return new Scroll(
+          !hits.isEmpty() ? hits.get(hits.size() - 1).id() : null,
+          hits.stream().map(Hit::source).toList());
+    } catch (IOException | ElasticsearchException e) {
+      String message =
+          MessageFormat.format(TextUtil.SEARCH_FAILED_CAUSE, searchParameters, e.getMessage());
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message, e);
+    }
   }
 
   @Override

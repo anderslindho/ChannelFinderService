@@ -1,7 +1,5 @@
 package org.phoebus.channelfinder.rest.api;
 
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.SCROLL_RESOURCE_URI;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,11 +11,9 @@ import org.phoebus.channelfinder.entity.Scroll;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping(SCROLL_RESOURCE_URI)
 public interface IChannelScroll {
 
   @Operation(
