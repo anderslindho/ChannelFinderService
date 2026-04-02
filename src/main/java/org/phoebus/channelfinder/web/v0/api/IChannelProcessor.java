@@ -1,4 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
+package org.phoebus.channelfinder.web.v0.api;
 
 import static org.phoebus.channelfinder.common.CFResourceDescriptors.SEARCH_PARAM_DESCRIPTION;
 

@@ -1,13 +1,11 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web.v0.controller;
 
-import org.phoebus.channelfinder.rest.api.IInfo;
 import org.phoebus.channelfinder.service.InfoService;
+import org.phoebus.channelfinder.web.v0.api.IInfo;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 @EnableAutoConfiguration
 @RequestMapping("${channelfinder.legacy.service-root:ChannelFinder}")

@@ -1,4 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
+package org.phoebus.channelfinder.web.v0.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.phoebus.channelfinder.entity.Tag;
+import org.phoebus.channelfinder.entity.Property;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,121 +16,112 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-public interface ITag {
+public interface IProperty {
 
   @Operation(
-      summary = "List all tags",
-      description = "Retrieve the list of all tags in the database.",
-      operationId = "listTags",
-      tags = {"Tag"})
+      summary = "List all properties",
+      description = "Retrieve the list of all properties in the database.",
+      operationId = "listProperties",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "List all Tags",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Tag.class)))),
+            description = "List of properties",
+            content =
+                @Content(array = @ArraySchema(schema = @Schema(implementation = Property.class)))),
         @ApiResponse(
             responseCode = "500",
-            description = "Error while trying to list all Tags",
+            description = "Error while listing properties",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
   @GetMapping
-  Iterable<Tag> list();
+  Iterable<Property> list();
 
   @Operation(
-      summary = "Get tag by name",
-      description = "Retrieve a tag by its name. Optionally include its channels.",
-      operationId = "getTagByName",
-      tags = {"Tag"})
+      summary = "Get property by name",
+      description = "Retrieve a property by its name. Optionally include its channels.",
+      operationId = "getPropertyByName",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Finding Tag by tagName",
-            content = @Content(schema = @Schema(implementation = Tag.class))),
+            description = "Fetch property by propertyName",
+            content = @Content(schema = @Schema(implementation = Property.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag not found",
+            description = "Property not found",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @GetMapping("/{tagName}")
-  Tag read(
-      @PathVariable("tagName") String tagName,
+  @GetMapping("/{propertyName}")
+  Property read(
+      @PathVariable("propertyName") String propertyName,
       @RequestParam(value = "withChannels", defaultValue = "true") boolean withChannels);
 
   @Operation(
-      summary = "Create or update a tag",
-      description = "Create and exclusively update the tag identified by the path parameter.",
-      operationId = "createOrUpdateTag",
-      tags = {"Tag"})
+      summary = "Create or update a property",
+      description = "Create and exclusively update the property identified by the path parameter.",
+      operationId = "createOrUpdateProperty",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Tag created and updated",
-            content = @Content(schema = @Schema(implementation = Tag.class))),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request",
-            content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
+            description = "Property created",
+            content = @Content(schema = @Schema(implementation = Property.class))),
         @ApiResponse(
             responseCode = "401",
             description = "Unauthorized",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag-, or Channel-name does not exist",
+            description = "Property not found",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Error while trying to create/update Tag",
+            description = "Error while trying to create property",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @PutMapping("/{tagName}")
-  Tag create(@PathVariable("tagName") String tagName, @RequestBody Tag tag);
+  @PutMapping("/{propertyName}")
+  Property create(
+      @PathVariable("propertyName") String propertyName, @RequestBody Property property);
 
   @Operation(
-      summary = "Create multiple tags",
-      description = "Create multiple tags in a single request.",
-      operationId = "createMultipleTags",
-      tags = {"Tag"})
+      summary = "Create multiple properties",
+      description = "Create multiple properties in a single request.",
+      operationId = "createMultipleProperties",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Tags created",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Tag.class)))),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request",
-            content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
+            description = "Properties created",
+            content = @Content(schema = @Schema(implementation = Property.class))),
         @ApiResponse(
             responseCode = "401",
             description = "Unauthorized",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
-            responseCode = "404",
-            description = "Tag-, or Channel-name does not exist",
-            content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
-        @ApiResponse(
             responseCode = "500",
-            description = "Error while trying to create Tags",
+            description = "Error while trying to create properties",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
   @PutMapping()
-  Iterable<Tag> create(@RequestBody Iterable<Tag> tags);
+  Iterable<Property> create(@RequestBody Iterable<Property> properties);
 
   @Operation(
-      summary = "Add tag to a single channel",
-      description = "Add the tag identified by tagName to the channel identified by channelName.",
-      operationId = "addTagToChannel",
-      tags = {"Tag"})
+      summary = "Add property to a single channel",
+      description =
+          "Add the property identified by propertyName to the channel identified by channelName.",
+      operationId = "addPropertyToChannel",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Tags added to a single channel",
-            content = @Content(schema = @Schema(implementation = Tag.class))),
+            description = "Property added to the channel",
+            content = @Content(schema = @Schema(implementation = Property.class))),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request",
@@ -141,29 +132,31 @@ public interface ITag {
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag-, or Channel-name does not exist",
+            description = "Property-, or Channel-name does not exist",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Tag creational error",
+            description = "Error while trying to add property",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @PutMapping("/{tagName}/{channelName}")
-  Tag addSingle(
-      @PathVariable("tagName") String tagName, @PathVariable("channelName") String channelName);
+  @PutMapping("/{propertyName}/{channelName}")
+  Property addSingle(
+      @PathVariable("propertyName") String propertyName,
+      @PathVariable("channelName") String channelName,
+      @RequestBody Property property);
 
   @Operation(
-      summary = "Update a tag",
+      summary = "Update a property",
       description =
-          "Update the tag identified by the path parameter, adding it to all channels in the payload.",
-      operationId = "updateTag",
-      tags = {"Tag"})
+          "Update the property identified by the path parameter, adding it to all channels in the payload.",
+      operationId = "updateProperty",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Tag updated",
-            content = @Content(schema = @Schema(implementation = Tag.class))),
+            description = "Property updated",
+            content = @Content(schema = @Schema(implementation = Property.class))),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request",
@@ -174,28 +167,29 @@ public interface ITag {
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag name does not exist",
+            description = "Property does not exist",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Tag update error",
+            description = "Error while trying to update property",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @PostMapping("/{tagName}")
-  Tag update(@PathVariable("tagName") String tagName, @RequestBody Tag tag);
+  @PostMapping("/{propertyName}")
+  Property update(
+      @PathVariable("propertyName") String propertyName, @RequestBody Property property);
 
   @Operation(
-      summary = "Update multiple tags",
-      description =
-          "Update multiple tags and all appropriate channels. The operation will fail if any of the specified channels do not exist.",
-      operationId = "updateMultipleTags",
-      tags = {"Tag"})
+      summary = "Update multiple properties",
+      description = "Update multiple properties and all appropriate channels.",
+      operationId = "updateMultipleProperties",
+      tags = {"Property"})
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Tags updated",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Tag.class)))),
+            description = "Properties updated",
+            content =
+                @Content(array = @ArraySchema(schema = @Schema(implementation = Property.class)))),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request",
@@ -206,71 +200,72 @@ public interface ITag {
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag-, or Channel-name does not exist",
+            description = "Property does not exist",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Error while updating tags",
+            description = "Error while trying to update properties",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
   @PostMapping()
-  Iterable<Tag> update(@RequestBody Iterable<Tag> tags);
+  Iterable<Property> update(@RequestBody Iterable<Property> properties);
 
   @Operation(
-      summary = "Delete a tag",
-      description = "Delete the tag identified by the path parameter from all channels.",
-      operationId = "deleteTag",
-      tags = {"Tag"})
+      summary = "Delete a property",
+      description = "Delete the property identified by the path parameter from all channels.",
+      operationId = "deleteProperty",
+      tags = {"Property"})
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Tag deleted"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request",
-            content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
+        @ApiResponse(responseCode = "200", description = "Property deleted"),
         @ApiResponse(
             responseCode = "401",
             description = "Unauthorized",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag does not exist",
+            description = "Property does not exist",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Tag creational error",
+            description = "Error while trying to delete property",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @DeleteMapping("/{tagName}")
-  void remove(@PathVariable("tagName") String tagName);
+  @DeleteMapping("/{propertyName}")
+  void remove(@PathVariable("propertyName") String propertyName);
 
   @Operation(
-      summary = "Delete tag from a channel",
+      summary = "Delete property from a channel",
       description =
-          "Delete the tag identified by tagName from the channel identified by channelName.",
-      operationId = "deleteTagFromChannel",
-      tags = {"Tag"})
+          "Delete the property identified by propertyName from the channel identified by channelName.",
+      operationId = "deletePropertyFromChannel",
+      tags = {"Property"})
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Tag deleted from the desired channel"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request",
-            content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
+        @ApiResponse(responseCode = "200", description = "Property deleted from the channel"),
         @ApiResponse(
             responseCode = "401",
             description = "Unauthorized",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "404",
-            description = "Tag does not exist",
+            description = "Property does not exist",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class))),
         @ApiResponse(
             responseCode = "500",
-            description = "Tag creational error",
+            description = "Error while trying to delete property from a channel",
             content = @Content(schema = @Schema(implementation = ResponseStatusException.class)))
       })
-  @DeleteMapping("/{tagName}/{channelName}")
+  @DeleteMapping("/{propertyName}/{channelName}")
   void removeSingle(
-      @PathVariable("tagName") String tagName, @PathVariable("channelName") String channelName);
+      @PathVariable("propertyName") String propertyName,
+      @PathVariable("channelName") String channelName);
+
+  /**
+   * Checks if 1. the property name is not null and matches the name in the body 2. the property
+   * owner is not null or empty 3. all the listed channels exist and have the property with a non
+   * null and non empty value
+   *
+   * @param property validate property
+   */
 }

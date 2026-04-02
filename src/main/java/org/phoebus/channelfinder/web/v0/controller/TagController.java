@@ -1,14 +1,12 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web.v0.controller;
 
 import org.phoebus.channelfinder.entity.Tag;
-import org.phoebus.channelfinder.rest.api.ITag;
 import org.phoebus.channelfinder.service.TagService;
+import org.phoebus.channelfinder.web.v0.api.ITag;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 @EnableAutoConfiguration
 @RequestMapping("${channelfinder.legacy.service-root:ChannelFinder}/resources/tags")

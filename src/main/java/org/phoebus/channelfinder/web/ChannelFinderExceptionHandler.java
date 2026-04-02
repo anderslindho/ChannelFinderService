@@ -1,4 +1,4 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

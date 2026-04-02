@@ -1,17 +1,15 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.web.v0.controller;
 
 import java.util.List;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.SearchResult;
-import org.phoebus.channelfinder.rest.api.IChannel;
 import org.phoebus.channelfinder.service.ChannelService;
+import org.phoebus.channelfinder.web.v0.api.IChannel;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 @EnableAutoConfiguration
 @RequestMapping("${channelfinder.legacy.service-root:ChannelFinder}/resources/channels")

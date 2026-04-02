@@ -1,10 +1,12 @@
 package org.phoebus.channelfinder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.phoebus.channelfinder.configuration.ElasticConfig;
 import org.phoebus.channelfinder.configuration.PopulateDBConfiguration;
 import org.phoebus.channelfinder.entity.Channel;
@@ -12,8 +14,8 @@ import org.phoebus.channelfinder.entity.Scroll;
 import org.phoebus.channelfinder.repository.ChannelRepository;
 import org.phoebus.channelfinder.repository.PropertyRepository;
 import org.phoebus.channelfinder.repository.TagRepository;
-import org.phoebus.channelfinder.rest.api.IChannelScroll;
-import org.phoebus.channelfinder.rest.controller.ChannelScrollController;
+import org.phoebus.channelfinder.web.v0.api.IChannelScroll;
+import org.phoebus.channelfinder.web.v0.controller.ChannelScrollController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +27,10 @@ import org.springframework.util.MultiValueMap;
 @WebMvcTest(ChannelScrollController.class)
 @TestPropertySource(value = "classpath:application_test.properties")
 @ContextConfiguration(classes = {ChannelScrollController.class, ElasticConfig.class})
+@EnabledIfEnvironmentVariable(
+    named = "GITHUB_ACTIONS",
+    matches = "true",
+    disabledReason = "Requires Elasticsearch on localhost:9200; runs in CI only")
 class ChannelScrollControllerIT {
 
   @Autowired IChannelScroll channelScroll;
@@ -40,13 +46,12 @@ class ChannelScrollControllerIT {
   @Autowired PopulateDBConfiguration populateDBConfiguration;
 
   @BeforeEach
-  public void setup() throws InterruptedException {
+  void setup() throws IOException {
     populateDBConfiguration.createDB(1);
-    Thread.sleep(10000);
   }
 
   @AfterEach
-  public void cleanup() throws InterruptedException {
+  void cleanup() {
     populateDBConfiguration.cleanupDB();
   }
 
@@ -79,7 +84,7 @@ class ChannelScrollControllerIT {
     // Search for a single unique channel
     searchParameters.add("~name", channelNames.get(0));
     Scroll scrollResult = channelScroll.query(searchParameters);
-    List<Channel> result = scrollResult.getChannels();
+    List<Channel> result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -91,7 +96,7 @@ class ChannelScrollControllerIT {
     searchParameters.clear();
     searchParameters.add("~name", "BR:C001-BI:2{BLA}Pos:?-RB");
     scrollResult = channelScroll.query(searchParameters);
-    result = scrollResult.getChannels();
+    result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -101,7 +106,7 @@ class ChannelScrollControllerIT {
     searchParameters.clear();
     searchParameters.add("~name", "BR:C001-BI:?{BLA}Pos:*");
     scrollResult = channelScroll.query(searchParameters);
-    result = scrollResult.getChannels();
+    result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -112,7 +117,7 @@ class ChannelScrollControllerIT {
     searchParameters.clear();
     searchParameters.add("~name", "SR*");
     scrollResult = channelScroll.query(searchParameters);
-    result = scrollResult.getChannels();
+    result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -123,7 +128,7 @@ class ChannelScrollControllerIT {
     searchParameters.clear();
     searchParameters.add("~name", "SR*|BR*");
     scrollResult = channelScroll.query(searchParameters);
-    result = scrollResult.getChannels();
+    result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -133,7 +138,7 @@ class ChannelScrollControllerIT {
     searchParameters.clear();
     searchParameters.add("~name", "SR*,BR*");
     scrollResult = channelScroll.query(searchParameters);
-    result = scrollResult.getChannels();
+    result = new ArrayList<>(scrollResult.getChannels());
     while (scrollResult.getChannels().size() == 100) {
       scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
       result.addAll(scrollResult.getChannels());
@@ -150,7 +155,7 @@ class ChannelScrollControllerIT {
       searchParameters.add("~tag", "group" + id + "_" + val_bucket.get(index));
 
       scrollResult = channelScroll.query(searchParameters);
-      result = scrollResult.getChannels();
+      result = new ArrayList<>(scrollResult.getChannels());
       while (scrollResult.getChannels().size() == 100) {
         scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
         result.addAll(scrollResult.getChannels());
@@ -176,7 +181,7 @@ class ChannelScrollControllerIT {
       searchParameters.add("group" + id, String.valueOf(val_bucket.get(index)));
 
       scrollResult = channelScroll.query(searchParameters);
-      result = scrollResult.getChannels();
+      result = new ArrayList<>(scrollResult.getChannels());
       while (scrollResult.getChannels().size() == 100) {
         scrollResult = channelScroll.query(scrollResult.getId(), searchParameters);
         result.addAll(scrollResult.getChannels());

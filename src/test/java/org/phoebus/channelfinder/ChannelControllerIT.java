@@ -17,17 +17,17 @@ import org.phoebus.channelfinder.configuration.ElasticConfig;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.Property;
 import org.phoebus.channelfinder.entity.Tag;
+import org.phoebus.channelfinder.exceptions.ChannelNotFoundException;
 import org.phoebus.channelfinder.repository.ChannelRepository;
 import org.phoebus.channelfinder.repository.PropertyRepository;
 import org.phoebus.channelfinder.repository.TagRepository;
-import org.phoebus.channelfinder.rest.api.IChannel;
-import org.phoebus.channelfinder.rest.controller.ChannelController;
+import org.phoebus.channelfinder.web.v0.api.IChannel;
+import org.phoebus.channelfinder.web.v0.controller.ChannelController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.server.ResponseStatusException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest(ChannelController.class)
@@ -64,7 +64,7 @@ class ChannelControllerIT {
   void readNonExistingXmlChannel() {
     // verify the channel failed to be read, as expected
     Assertions.assertThrows(
-        ResponseStatusException.class, () -> channelManager.read("fakeChannel"));
+        ChannelNotFoundException.class, () -> channelManager.read("fakeChannel"));
   }
 
   /** create a simple channel */

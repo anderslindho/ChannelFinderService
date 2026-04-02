@@ -12,12 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.phoebus.channelfinder.common.CFResourceDescriptors;
 import org.phoebus.channelfinder.entity.Scroll;
-import org.phoebus.channelfinder.rest.api.IChannelScroll;
-import org.phoebus.channelfinder.rest.controller.ChannelProcessorController;
+import org.phoebus.channelfinder.service.ChannelScrollService;
 import org.phoebus.channelfinder.service.external.ArchiverService;
+import org.phoebus.channelfinder.web.v0.controller.ChannelProcessorController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -36,7 +35,7 @@ class ChannelProcessorControllerIT {
       "Basic " + Base64.getEncoder().encodeToString("admin:adminPass".getBytes());
 
   @Autowired protected MockMvc mockMvc;
-  @MockBean IChannelScroll channelScroll;
+  @MockitoBean ChannelScrollService channelScrollService;
   @MockitoBean ArchiverService archiverService;
 
   @Test
@@ -71,7 +70,8 @@ class ChannelProcessorControllerIT {
 
   @Test
   void testProcessAllChannels() throws Exception {
-    Mockito.when(channelScroll.query(Mockito.any())).thenReturn(new Scroll("", List.of()));
+    Mockito.when(channelScrollService.search(Mockito.any(), Mockito.any()))
+        .thenReturn(new Scroll("", List.of()));
 
     MockHttpServletRequestBuilder request =
         put("/" + CFResourceDescriptors.CHANNEL_PROCESSOR_RESOURCE_URI + "/process/all")
@@ -81,7 +81,8 @@ class ChannelProcessorControllerIT {
 
   @Test
   void testProcessQuery() throws Exception {
-    Mockito.when(channelScroll.query(Mockito.any())).thenReturn(new Scroll("", List.of()));
+    Mockito.when(channelScrollService.search(Mockito.any(), Mockito.any()))
+        .thenReturn(new Scroll("", List.of()));
     MockHttpServletRequestBuilder request =
         put("/" + CFResourceDescriptors.CHANNEL_PROCESSOR_RESOURCE_URI + "/process/query")
             .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION);

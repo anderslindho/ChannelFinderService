@@ -30,7 +30,7 @@ import org.phoebus.channelfinder.common.CFResourceDescriptors;
 import org.phoebus.channelfinder.docker.ITUtil.AuthorizationChoice;
 import org.phoebus.channelfinder.entity.Channel;
 import org.phoebus.channelfinder.entity.Property;
-import org.phoebus.channelfinder.rest.controller.PropertyController;
+import org.phoebus.channelfinder.web.v0.controller.PropertyController;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

@@ -1,4 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
+package org.phoebus.channelfinder.web.v0.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

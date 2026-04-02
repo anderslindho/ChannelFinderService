@@ -26,7 +26,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.phoebus.channelfinder.common.CFResourceDescriptors;
 import org.phoebus.channelfinder.entity.Scroll;
-import org.phoebus.channelfinder.rest.controller.ChannelScrollController;
+import org.phoebus.channelfinder.web.v0.controller.ChannelScrollController;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
