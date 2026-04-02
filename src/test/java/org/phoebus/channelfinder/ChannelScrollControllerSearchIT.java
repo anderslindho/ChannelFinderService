@@ -41,7 +41,7 @@ class ChannelScrollControllerSearchIT {
   @Autowired PopulateDBConfiguration populateDBConfiguration;
 
   @BeforeEach
-  public void setup() throws InterruptedException {
+  public void setup() throws InterruptedException, IOException {
     populateDBConfiguration.createDB(1);
     Thread.sleep(10000);
   }

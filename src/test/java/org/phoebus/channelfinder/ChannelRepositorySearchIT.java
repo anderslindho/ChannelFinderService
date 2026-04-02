@@ -60,7 +60,7 @@ class ChannelRepositorySearchIT {
   }
 
   @BeforeEach
-  public void setup() throws InterruptedException {
+  void setup() throws InterruptedException, IOException {
     populateDBConfiguration.cleanupDB();
     populateDBConfiguration.createDB(CELLS);
     Thread.sleep(5000);

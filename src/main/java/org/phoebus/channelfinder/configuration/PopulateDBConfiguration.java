@@ -179,7 +179,7 @@ public class PopulateDBConfiguration {
     }
   }
 
-  public synchronized void createDB(int cells) {
+  public synchronized void createDB(int cells) throws IOException {
     numberOfCells = cells;
     createDB();
   }
@@ -188,7 +188,7 @@ public class PopulateDBConfiguration {
     return channelList;
   }
 
-  public synchronized void createDB() {
+  public synchronized void createDB() throws IOException {
     int freq = 25;
     Collection<Channel> channels = new ArrayList<>();
     createSRChannels(channels, freq);
@@ -221,35 +221,31 @@ public class PopulateDBConfiguration {
     logger.log(Level.INFO, "completed populating");
   }
 
-  private void checkBulkResponse(BulkRequest.Builder br) {
+  private void checkBulkResponse(BulkRequest.Builder br) throws IOException {
+    BulkResponse results;
     try {
-      BulkResponse results = client.bulk(br.build());
-      if (results.errors()) {
-        logger.log(Level.SEVERE, "CreateDB Bulk had errors");
-        for (BulkResponseItem item : results.items()) {
-          if (item.error() != null) {
-            logger.log(Level.SEVERE, () -> item.error().reason());
-          }
+      results = client.bulk(br.build());
+    } catch (IOException e) {
+      throw new IOException("CreateDB bulk operation failed", e);
+    }
+    if (results.errors()) {
+      StringBuilder errors = new StringBuilder("CreateDB bulk had errors:");
+      for (BulkResponseItem item : results.items()) {
+        if (item.error() != null) {
+          errors.append("\n  ").append(item.error().reason());
         }
       }
-    } catch (IOException e) {
-      logger.log(Level.WARNING, "CreateDB Bulk operation failed.", e);
+      throw new IOException(errors.toString());
     }
   }
 
-  private void bulkInsertAllChannels(Collection<Channel> channels) {
-    try {
-      logger.info("Bulk inserting channels");
-
-      bulkInsertChannels(channels);
-      channels.clear();
-
-    } catch (Exception e) {
-      logger.log(Level.WARNING, e.getMessage(), e);
-    }
+  private void bulkInsertAllChannels(Collection<Channel> channels) throws IOException {
+    logger.info("Bulk inserting channels");
+    bulkInsertChannels(channels);
+    channels.clear();
   }
 
-  private void createBOChannels(Collection<Channel> channels, int freq) {
+  private void createBOChannels(Collection<Channel> channels, int freq) throws IOException {
     logger.info(() -> "Creating BO channels");
 
     for (int i = 1; i <= numberOfCells; i++) {
@@ -263,7 +259,7 @@ public class PopulateDBConfiguration {
     }
   }
 
-  private void createSRChannels(Collection<Channel> channels, int freq) {
+  private void createSRChannels(Collection<Channel> channels, int freq) throws IOException {
     logger.info("Creating SR channels");
 
     for (int i = 1; i <= numberOfCells; i++) {
@@ -400,32 +396,43 @@ public class PopulateDBConfiguration {
     return result;
   }
 
-  private void bulkInsertChannels(Collection<Channel> result) throws IOException {
-    long start = System.currentTimeMillis();
-    BulkRequest.Builder br = new BulkRequest.Builder();
-    for (Channel channel : result) {
-      br.operations(
-          op ->
-              op.index(
-                  IndexOperation.of(
-                      i ->
-                          i.index(esService.getES_CHANNEL_INDEX())
-                              .id(channel.getName())
-                              .document(channel))));
-    }
-    String prepare = "|Prepare: " + (System.currentTimeMillis() - start) + "|";
-    start = System.currentTimeMillis();
-    br.refresh(Refresh.True);
+  private static final int BULK_INSERT_BATCH_SIZE = 1000;
 
-    BulkResponse srResult = client.bulk(br.build());
-    String execute = "|Execute: " + (System.currentTimeMillis() - start) + "|";
-    logger.log(Level.INFO, () -> "Inserted cell " + prepare + " " + execute);
-    if (srResult.errors()) {
-      logger.log(Level.SEVERE, "Bulk insert had errors");
-      for (BulkResponseItem item : srResult.items()) {
-        if (item.error() != null) {
-          logger.log(Level.SEVERE, () -> item.error().reason());
+  private void bulkInsertChannels(Collection<Channel> channels) throws IOException {
+    List<Channel> list = new ArrayList<>(channels);
+    for (int offset = 0; offset < list.size(); offset += BULK_INSERT_BATCH_SIZE) {
+      List<Channel> batch =
+          list.subList(offset, Math.min(offset + BULK_INSERT_BATCH_SIZE, list.size()));
+      int batchCount = batch.size();
+      long t0 = System.currentTimeMillis();
+      BulkRequest.Builder br = new BulkRequest.Builder();
+      for (Channel channel : batch) {
+        br.operations(
+            op ->
+                op.index(
+                    IndexOperation.of(
+                        i ->
+                            i.index(esService.getES_CHANNEL_INDEX())
+                                .id(channel.getName())
+                                .document(channel))));
+      }
+      String prepare = "|Prepare: " + (System.currentTimeMillis() - t0) + "|";
+      t0 = System.currentTimeMillis();
+      br.refresh(Refresh.True);
+      BulkResponse result = client.bulk(br.build());
+      String execute = "|Execute: " + (System.currentTimeMillis() - t0) + "|";
+      logger.log(
+          Level.INFO,
+          () -> "Inserted batch (" + batchCount + " channels) " + prepare + " " + execute);
+      if (result.errors()) {
+        StringBuilder errors = new StringBuilder("Bulk insert batch had errors:");
+        for (BulkResponseItem item : result.items()) {
+          if (item.error() != null) {
+            errors.append("\n  ").append(item.error().reason());
+          }
         }
+        logger.log(Level.SEVERE, errors::toString);
+        throw new IOException(errors.toString());
       }
     }
   }
