@@ -1,4 +1,4 @@
-package org.phoebus.channelfinder.web;
+package org.phoebus.channelfinder.web.v0;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,16 +17,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Translates domain exceptions thrown by service classes to HTTP responses. Controllers should
- * propagate domain exceptions; this advice maps them to status codes in one place.
+ * Translates domain exceptions thrown by v0 service classes to HTTP responses.
  *
- * <p>Scoped to the v0 legacy API; a separate handler covers future API versions.
+ * <p>Scoped to the v0 API; a separate handler covers future API versions.
+ *
+ * @deprecated v0 API support ends after the planned deprecation period. Replace with a {@code
+ *     ChannelFinderExceptionHandler} using {@code ProblemDetail} (RFC 9457) when the v1 API lands.
  */
+@Deprecated
 @RestControllerAdvice(basePackages = "org.phoebus.channelfinder.web.v0.controller")
-public class ChannelFinderExceptionHandler {
+public class V0ExceptionHandler {
 
-  private static final Logger logger =
-      Logger.getLogger(ChannelFinderExceptionHandler.class.getName());
+  private static final Logger logger = Logger.getLogger(V0ExceptionHandler.class.getName());
 
   @ExceptionHandler(ChannelNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
