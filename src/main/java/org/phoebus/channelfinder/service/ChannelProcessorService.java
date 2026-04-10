@@ -10,12 +10,18 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.phoebus.channelfinder.configuration.ChannelProcessor;
 import org.phoebus.channelfinder.entity.Channel;
+import org.phoebus.channelfinder.entity.Scroll;
+import org.phoebus.channelfinder.exceptions.UnauthorizedException;
+import org.phoebus.channelfinder.service.AuthorizationService.ROLES;
 import org.phoebus.channelfinder.service.model.archiver.ChannelProcessorInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class ChannelProcessorService {
@@ -23,18 +29,50 @@ public class ChannelProcessorService {
   private static final Logger logger = Logger.getLogger(ChannelProcessorService.class.getName());
 
   private final List<ChannelProcessor> channelProcessors;
-
   private final TaskExecutor channelFinderTaskExecutor;
-
+  private final AuthorizationService authorizationService;
+  private final ChannelScrollService channelScrollService;
   private final int chunkSize;
+  private final int defaultMaxSize;
 
   public ChannelProcessorService(
       @Autowired List<ChannelProcessor> channelProcessors,
       @Autowired @Qualifier("channelFinderTaskExecutor") TaskExecutor channelFinderTaskExecutor,
-      @Value("${processors.chunking.size:10000}") int chunkSize) {
+      @Autowired AuthorizationService authorizationService,
+      @Autowired ChannelScrollService channelScrollService,
+      @Value("${processors.chunking.size:10000}") int chunkSize,
+      @Value("${elasticsearch.query.size:10000}") int defaultMaxSize) {
     this.channelProcessors = channelProcessors;
     this.channelFinderTaskExecutor = channelFinderTaskExecutor;
+    this.authorizationService = authorizationService;
+    this.channelScrollService = channelScrollService;
     this.chunkSize = chunkSize;
+    this.defaultMaxSize = defaultMaxSize;
+  }
+
+  public long processAllChannels() {
+    if (!authorizationService.isAuthorizedRole(
+        SecurityContextHolder.getContext().getAuthentication(), ROLES.CF_ADMIN)) {
+      throw new UnauthorizedException(
+          "User does not have the proper authorization to perform this operation: /process/all");
+    }
+    logger.log(Level.INFO, "Calling processor on ALL channels in ChannelFinder");
+    MultiValueMap<String, String> searchParameters = new LinkedMultiValueMap<>();
+    searchParameters.add("~name", "*");
+    return processChannelsByQuery(searchParameters);
+  }
+
+  public long processChannelsByQuery(MultiValueMap<String, String> allRequestParams) {
+    long channelCount = 0;
+    Scroll scrollResult = channelScrollService.search(null, allRequestParams);
+    channelCount += scrollResult.getChannels().size();
+    sendToProcessors(scrollResult.getChannels());
+    while (scrollResult.getChannels().size() == defaultMaxSize) {
+      scrollResult = channelScrollService.search(scrollResult.getId(), allRequestParams);
+      channelCount += scrollResult.getChannels().size();
+      sendToProcessors(scrollResult.getChannels());
+    }
+    return channelCount;
   }
 
   public long getProcessorCount() {

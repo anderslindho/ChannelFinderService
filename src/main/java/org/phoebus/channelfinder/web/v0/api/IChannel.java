@@ -1,6 +1,5 @@
-package org.phoebus.channelfinder.rest.api;
+package org.phoebus.channelfinder.web.v0.api;
 
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.CHANNEL_RESOURCE_URI;
 import static org.phoebus.channelfinder.common.CFResourceDescriptors.SEARCH_PARAM_DESCRIPTION;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,11 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping(CHANNEL_RESOURCE_URI)
 public interface IChannel {
 
   @Operation(
@@ -272,20 +269,4 @@ public interface IChannel {
       })
   @DeleteMapping("/{channelName}")
   void remove(@PathVariable("channelName") String channelName);
-
-  /**
-   * Checks if 1. the channel name is not null and matches the name in the body 2. the channel owner
-   * is not null or empty 3. all the listed tags/props exist and prop value is not null or empty
-   *
-   * @param channel channel to be validated
-   */
-  void validateChannelRequest(Channel channel);
-
-  /**
-   * Checks if 1. the tag names are not null 2. the tag owners are not null or empty 3. all the
-   * channels exist
-   *
-   * @param channels list of channels to be validated
-   */
-  void validateChannelRequest(Iterable<Channel> channels);
 }

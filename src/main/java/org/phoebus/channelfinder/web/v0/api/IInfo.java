@@ -1,6 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
-
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.CF_SERVICE_INFO;
+package org.phoebus.channelfinder.web.v0.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,9 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping(CF_SERVICE_INFO)
 public interface IInfo {
 
   @Operation(

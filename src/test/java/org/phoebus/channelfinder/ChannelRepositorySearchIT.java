@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.phoebus.channelfinder.configuration.ElasticConfig;
 import org.phoebus.channelfinder.configuration.PopulateDBConfiguration;
 import org.phoebus.channelfinder.entity.SearchResult;
@@ -33,6 +34,10 @@ import org.springframework.util.MultiValueMap;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest(ChannelRepository.class)
 @TestPropertySource(locations = "classpath:application_test.properties")
+@EnabledIfEnvironmentVariable(
+    named = "GITHUB_ACTIONS",
+    matches = "true",
+    disabledReason = "Requires Elasticsearch on localhost:9200; runs in CI only")
 @ContextConfiguration(classes = {ChannelRepository.class, ElasticConfig.class})
 class ChannelRepositorySearchIT {
   private static final Logger logger = Logger.getLogger(ChannelRepositorySearchIT.class.getName());
@@ -55,7 +60,7 @@ class ChannelRepositorySearchIT {
   }
 
   @BeforeEach
-  public void setup() throws InterruptedException {
+  void setup() throws InterruptedException, IOException {
     populateDBConfiguration.cleanupDB();
     populateDBConfiguration.createDB(CELLS);
     Thread.sleep(5000);

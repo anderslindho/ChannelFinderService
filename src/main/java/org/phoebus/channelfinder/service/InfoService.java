@@ -1,8 +1,5 @@
-package org.phoebus.channelfinder.rest.controller;
+package org.phoebus.channelfinder.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchVersionInfo;
-import co.elastic.clients.elasticsearch.core.InfoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -12,55 +9,49 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.phoebus.channelfinder.configuration.ElasticConfig;
-import org.phoebus.channelfinder.rest.api.IInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@CrossOrigin
-@RestController
-@EnableAutoConfiguration
-public class InfoController implements IInfo {
+@Service
+public class InfoService {
 
-  private static final Logger logger = Logger.getLogger(InfoController.class.getName());
-
-  @Value("${channelfinder.version:4.7.0}")
-  private String version;
-
-  @Autowired private ElasticConfig esService;
+  private static final Logger logger = Logger.getLogger(InfoService.class.getName());
 
   private static final ObjectMapper objectMapper =
       new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-  @Override
-  public String info() {
+  private final ElasticConfig esService;
 
+  @Value("${channelfinder.version:unknown}")
+  private String version;
+
+  public InfoService(ElasticConfig esService) {
+    this.esService = esService;
+  }
+
+  public String info() {
     Map<String, Object> cfServiceInfo = new LinkedHashMap<>();
     cfServiceInfo.put("name", "ChannelFinder Service");
     cfServiceInfo.put("version", version);
 
     Map<String, String> elasticInfo = new LinkedHashMap<>();
     try {
-
-      ElasticsearchClient client = esService.getSearchClient();
-      InfoResponse response = client.info();
-
+      var client = esService.getSearchClient();
+      var response = client.info();
       elasticInfo.put("status", "Connected");
       elasticInfo.put("clusterName", response.clusterName());
       elasticInfo.put("clusterUuid", response.clusterUuid());
-      ElasticsearchVersionInfo elasticVersion = response.version();
-      elasticInfo.put("version", elasticVersion.number());
+      elasticInfo.put("version", response.version().number());
     } catch (IOException e) {
-      logger.log(Level.WARNING, "Failed to create ChannelFinder service info resource.", e);
+      logger.log(Level.WARNING, "Failed to retrieve Elasticsearch info", e);
       elasticInfo.put("status", "Failed to connect to elastic " + e.getLocalizedMessage());
     }
     cfServiceInfo.put("elastic", elasticInfo);
+
     try {
       return objectMapper.writeValueAsString(cfServiceInfo);
     } catch (JsonProcessingException e) {
-      logger.log(Level.WARNING, "Failed to create ChannelFinder service info resource.", e);
+      logger.log(Level.WARNING, "Failed to serialize ChannelFinder service info", e);
       return "Failed to gather ChannelFinder service info";
     }
   }

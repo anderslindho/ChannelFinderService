@@ -71,7 +71,7 @@ class ChannelProcessorServiceTest {
   @BeforeEach
   void setUp() {
     channelProcessorService =
-        new ChannelProcessorService(List.of(dummyProcessor), Runnable::run, 10);
+        new ChannelProcessorService(List.of(dummyProcessor), Runnable::run, null, null, 10, 10000);
   }
 
   @Test

@@ -1,6 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
-
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.TAG_RESOURCE_URI;
+package org.phoebus.channelfinder.web.v0.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -15,11 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping(TAG_RESOURCE_URI)
 public interface ITag {
 
   @Operation(
@@ -277,37 +273,4 @@ public interface ITag {
   @DeleteMapping("/{tagName}/{channelName}")
   void removeSingle(
       @PathVariable("tagName") String tagName, @PathVariable("channelName") String channelName);
-
-  /**
-   * Checks if all the tags included satisfy the following conditions
-   *
-   * <ol>
-   *   <li>the tag names are not null or empty and matches the names in the bodies
-   *   <li>the tag owners are not null or empty
-   *   <li>all the channels exist
-   * </ol>
-   *
-   * @param tags the list of tags to be validated
-   */
-  void validateTagRequest(Iterable<Tag> tags);
-
-  /**
-   * Checks if tag satisfies the following conditions
-   *
-   * <ol>
-   *   <li>the tag name is not null or empty and matches the name in the body
-   *   <li>the tag owner is not null or empty
-   *   <li>all the listed channels exist
-   * </ol>
-   *
-   * @param tag the tag to be validates
-   */
-  void validateTagRequest(Tag tag);
-
-  /**
-   * Checks if channel with name "channelName" exists
-   *
-   * @param channelName check channel exists
-   */
-  void validateTagWithChannelRequest(String channelName);
 }

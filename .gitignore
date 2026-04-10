@@ -16,6 +16,7 @@
 *.swp
 *.swo
 *~
+.cursor/
 
 ### Logs ###
 *.log

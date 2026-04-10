@@ -1,6 +1,4 @@
-package org.phoebus.channelfinder.rest.api;
-
-import static org.phoebus.channelfinder.common.CFResourceDescriptors.SCROLL_RESOURCE_URI;
+package org.phoebus.channelfinder.web.v0.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,11 +11,9 @@ import org.phoebus.channelfinder.entity.Scroll;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping(SCROLL_RESOURCE_URI)
 public interface IChannelScroll {
 
   @Operation(
@@ -64,20 +60,4 @@ public interface IChannelScroll {
           String scrollId,
       @Parameter(description = CFResourceDescriptors.SEARCH_PARAM_DESCRIPTION) @RequestParam
           MultiValueMap<String, String> searchParameters);
-
-  /**
-   * Search for a list of channels based on their name, tags, and/or properties. Search parameters
-   * ~name - The name of the channel ~tags - A list of comma separated values
-   * ${propertyName}:${propertyValue} -
-   *
-   * <p>The query result is sorted based on the channel name ~size - The number of channels to be
-   * returned ~from - The starting index of the channel list
-   *
-   * <p>TODO combine with ChannelRepository code.
-   *
-   * @param scrollId scroll ID
-   * @param searchParameters - search parameters for scrolling searches
-   * @return search scroll
-   */
-  Scroll search(String scrollId, MultiValueMap<String, String> searchParameters);
 }
