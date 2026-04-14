@@ -3,8 +3,8 @@ package org.phoebus.channelfinder.configuration;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.servlet.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,7 +23,7 @@ public class HttpConnectorConfig {
   @ConditionalOnProperty(name = "server.http.enable")
   public ServletWebServerFactory servletContainer() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-    tomcat.addAdditionalTomcatConnectors(getHttpConnector());
+    tomcat.addAdditionalConnectors(getHttpConnector());
     return tomcat;
   }
 
