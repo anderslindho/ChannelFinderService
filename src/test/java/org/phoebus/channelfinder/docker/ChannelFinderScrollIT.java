@@ -212,23 +212,23 @@ class ChannelFinderScrollIT {
       actual = ITUtilScroll.assertQueryChannels("?~size=3&~from=1", 3);
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
-              "/" + actual.getId() + "?~size=3&~from=1", HttpURLConnection.HTTP_INTERNAL_ERROR, -1);
+              "/" + actual.getId() + "?~size=3&~from=1", HttpURLConnection.HTTP_BAD_REQUEST, -1);
 
       actual = ITUtilScroll.assertQueryChannels("?~size=3&~from=2", 3);
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
-              "/" + actual.getId() + "?~size=3&~from=2", HttpURLConnection.HTTP_INTERNAL_ERROR, -1);
+              "/" + actual.getId() + "?~size=3&~from=2", HttpURLConnection.HTTP_BAD_REQUEST, -1);
 
       actual = ITUtilScroll.assertQueryChannels("?~size=3&~from=3", 3);
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
-              "/" + actual.getId() + "?~size=3&~from=3", HttpURLConnection.HTTP_INTERNAL_ERROR, -1);
+              "/" + actual.getId() + "?~size=3&~from=3", HttpURLConnection.HTTP_BAD_REQUEST, -1);
 
       actual = ITUtilScroll.assertQueryChannels("?~name=*1*&~size=4&~from=2", 4);
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?~name=*1*&~size=4&~from=2",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       //         property name (domain)
@@ -259,7 +259,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?domain=?ow*&~size=4&~from=2",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual =
@@ -286,7 +286,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?domain=*o&domain=asdf?&~size=3&~from=1",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual = ITUtilScroll.assertQueryChannels("?domain!=cryo", 5);
@@ -342,7 +342,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?element=*a*&~size=2&~from=4",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual = ITUtilScroll.assertQueryChannels("?element=initial&element=radio&element=supra", 6);
@@ -371,7 +371,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?element=initial&element=radio&element=supra&~size=4&~from=3",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual = ITUtilScroll.assertQueryChannels("?element!=initial", 8);
@@ -399,7 +399,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?element!=source&element!=initial&~size=6&~from=5",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       //         property name (type)
@@ -496,7 +496,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?cell=block?&~size=5&~from=5",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual = ITUtilScroll.assertQueryChannels("?cell=block1&cell=block2", 4);
@@ -578,7 +578,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?~tag=*i*&~size=4&~from=1",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
 
       actual = ITUtilScroll.assertQueryChannels("?~tag!=noteworthy", 0);
@@ -630,7 +630,7 @@ class ChannelFinderScrollIT {
       actual =
           ITUtilScroll.assertContinueChannelsQuery(
               "/" + actual.getId() + "?domain=*r*&type=*write&~tag=noteworthy&~size=3&~from=2",
-              HttpURLConnection.HTTP_INTERNAL_ERROR,
+              HttpURLConnection.HTTP_BAD_REQUEST,
               -1);
     } catch (Exception e) {
       fail();
