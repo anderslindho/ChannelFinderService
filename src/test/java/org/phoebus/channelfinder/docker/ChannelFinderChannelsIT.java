@@ -953,7 +953,7 @@ public class ChannelFinderChannelsIT {
       ITUtilChannels.assertCountChannels(
           "?~size=3&~from=-1", ITTestFixture.channels_all_properties_tags.length);
       ITUtilChannels.assertListChannels(
-          "?~size=3&~from=-1", HttpURLConnection.HTTP_INTERNAL_ERROR, -1);
+          "?~size=3&~from=-1", HttpURLConnection.HTTP_BAD_REQUEST, -1);
 
       ITUtilChannels.assertCountChannels(
           "?~size=3&~from=0", ITTestFixture.channels_all_properties_tags.length);
