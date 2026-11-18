@@ -197,7 +197,7 @@ class ChannelFinderScrollIT {
 
       actual =
           ITUtilScroll.assertQueryChannels(
-              "?~size=3&~from=-1", HttpURLConnection.HTTP_INTERNAL_ERROR, -1);
+              "?~size=3&~from=-1", HttpURLConnection.HTTP_BAD_REQUEST, -1);
 
       actual = ITUtilScroll.assertQueryChannels("?~size=3&~from=0", 3);
       actual =
